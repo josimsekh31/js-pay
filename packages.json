@@ -1,0 +1,7 @@
+{
+  "name": "js-pay",
+  "version": "1.0.0",
+  "dependencies": {
+    "md5": "^2.3.0"
+  }
+}
