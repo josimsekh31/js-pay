@@ -1,33 +1,34 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSPay – Manual UPI Payment Tool</title>
+    <title>JSPay - Secure Payment Gateway</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
-            --bg-body: #f3f4f6;
-            --bg-card: #ffffff;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
             --text-main: #111827;
-            --text-muted: #6b7280;
+            --text-sub: #6b7280;
             --border: #e5e7eb;
             --success: #10b981;
             --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --radius: 12px;
+            --radius: 16px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            background-color: var(--bg-body);
+            background-color: var(--bg);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -39,25 +40,12 @@
         .container {
             width: 100%;
             max-width: 420px;
-            perspective: 1000px;
-        }
-
-        .card {
-            background: var(--bg-card);
+            background: var(--card-bg);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 2rem;
-            position: relative;
             overflow: hidden;
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
         }
 
         @keyframes fadeIn {
@@ -65,88 +53,80 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Headers */
         .header {
+            padding: 24px;
             text-align: center;
-            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-bottom: 1px solid var(--border);
         }
 
-        .brand-logo {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .title {
+        .header h1 {
             font-size: 1.25rem;
             font-weight: 700;
-            color: var(--text-main);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .subtitle {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
+        .content {
+            padding: 24px;
         }
 
-        /* Forms */
-        .form-group {
-            margin-bottom: 1.25rem;
-            position: relative;
+        .input-group {
+            margin-bottom: 20px;
         }
 
-        .form-label {
+        .input-group label {
             display: block;
             font-size: 0.875rem;
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 0.5rem;
+            margin-bottom: 8px;
         }
 
         .input-wrapper {
             position: relative;
         }
 
-        .input-icon {
+        .input-wrapper i {
             position: absolute;
-            left: 1rem;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 1rem;
+            color: var(--text-sub);
         }
 
-        .form-input {
+        .input-field {
             width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            padding: 12px 16px 12px 40px;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
+            transition: all 0.2s;
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            background: #f9fafb;
-        }
-
-        .form-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
             background: #fff;
         }
 
-        /* Buttons */
+        .input-field:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
         .btn {
             width: 100%;
-            padding: 0.875rem;
+            padding: 14px;
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.1s, background-color 0.2s;
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
+            gap: 8px;
         }
 
         .btn-primary {
@@ -156,411 +136,439 @@
 
         .btn-primary:hover {
             background-color: var(--primary-hover);
-            transform: translateY(-1px);
         }
 
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--border);
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background-color: #f3f4f6;
             color: var(--text-main);
-            margin-top: 1rem;
+            margin-top: 12px;
         }
 
-        .btn-outline:hover {
-            background-color: #f9fafb;
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
         }
 
-        /* Payment UI */
-        .qr-container {
-            display: flex;
-            justify-content: center;
-            margin: 1.5rem 0;
-            padding: 1rem;
-            background: #fff;
-            border: 1px dashed var(--border);
+        /* Result Section */
+        #result-area {
+            margin-top: 24px;
+            padding: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
             border-radius: 12px;
+            display: none;
         }
 
-        .qr-code {
-            width: 180px;
-            height: 180px;
-            object-fit: contain;
+        .link-box {
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            background: #fff;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        /* Payment View Styles */
+        .payment-summary {
+            text-align: center;
+            margin-bottom: 24px;
         }
 
         .amount-display {
-            text-align: center;
-            font-size: 2rem;
+            font-size: 2.5rem;
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 0.5rem;
+            margin: 8px 0;
         }
 
-        .vpa-badge {
-            display: inline-block;
-            background: #eef2ff;
+        .payee-badge {
+            display: inline-flex;
+            align-items: center;
+            background: #e0e7ff;
             color: var(--primary);
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            width: 100%;
         }
 
-        /* Success State */
-        .success-animation {
-            text-align: center;
-            padding: 2rem 0;
-        }
-
-        .check-icon {
-            font-size: 4rem;
-            color: var(--success);
-            margin-bottom: 1rem;
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
-        }
-
-        .secure-badge {
+        .qr-container {
+            background: white;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 2rem;
-            opacity: 0.7;
+            position: relative;
         }
 
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #333;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+        .qr-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
             font-size: 0.9rem;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-            z-index: 100;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border);
         }
 
-        .toast.show {
-            opacity: 1;
+        .meta-row:last-child {
+            border-bottom: none;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .success-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+            display: none;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 16px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.85rem; color: var(--text-sub); }
+        .mt-4 { margin-top: 1rem; }
+        
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1f2937;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- SCREEN 1: CONFIGURATION -->
-        <div id="screen-config" class="card fade-in">
-            <div class="header">
-                <div class="brand-logo"><i class="fa-solid fa-shield-halved"></i></div>
-                <h1 class="title">JSPay</h1>
-                <p class="subtitle">Secure Manual UPI Payment Gateway</p>
-            </div>
-
-            <form id="configForm" onsubmit="app.generatePayment(event)">
-                <div class="form-group">
-                    <label class="form-label">Payee UPI ID</label>
+    <!-- Generator View -->
+    <div id="generator-view" class="container">
+        <div class="header">
+            <h1><i class="fa-solid fa-link"></i> JSPay Generator</h1>
+            <p class="text-sm">Create secure, encrypted payment links</p>
+        </div>
+        
+        <div class="content">
+            <form id="gen-form" onsubmit="generateLink(event)">
+                <div class="input-group">
+                    <label>Payee VPA (UPI ID)</label>
                     <div class="input-wrapper">
-                        <i class="fa-solid fa-user-tag input-icon"></i>
-                        <input type="text" id="upiId" class="form-input" value="josimsekh33@ybl" required>
+                        <i class="fa-solid fa-user-shield"></i>
+                        <input type="text" id="vpa" class="input-field" value="josimsekh33@ybl" placeholder="example@upi" required>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Amount (INR)</label>
+                <div class="input-group">
+                    <label>Amount (INR)</label>
                     <div class="input-wrapper">
-                        <i class="fa-solid fa-indian-rupee-sign input-icon"></i>
-                        <input type="number" id="amount" class="form-input" placeholder="0.00" min="1" step="0.01" required>
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
+                        <input type="number" id="amount" class="input-field" placeholder="0.00" min="1" step="0.01" required>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Note (Optional)</label>
+                <div class="input-group">
+                    <label>Note (Optional)</label>
                     <div class="input-wrapper">
-                        <i class="fa-solid fa-message input-icon"></i>
-                        <input type="text" id="note" class="form-input" placeholder="e.g. Bill Payment">
+                        <i class="fa-solid fa-note-sticky"></i>
+                        <input type="text" id="note" class="input-field" placeholder="Payment for..." maxlength="50">
                     </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-qrcode"></i> Generate Payment
+                    <i class="fa-solid fa-lock"></i> Generate Secure Link
                 </button>
             </form>
 
-            <div class="secure-badge">
-                <i class="fa-solid fa-lock"></i> Client-side Encryption Enabled
-            </div>
-        </div>
-
-        <!-- SCREEN 2: PAYMENT GATEWAY -->
-        <div id="screen-payment" class="card hidden">
-            <div class="header">
-                <p class="subtitle">Scanning to Pay</p>
-                <div id="displayAmount" class="amount-display">₹0</div>
-                <div id="displayVpa" class="vpa-badge">@upi</div>
-            </div>
-
-            <div class="qr-container">
-                <img id="qrImage" src="" alt="UPI QR Code" class="qr-code">
-            </div>
-
-            <p class="subtitle" style="text-align: center; margin-bottom: 1rem;">Scan with any UPI App</p>
-
-            <a id="deepLinkBtn" href="#" class="btn btn-primary">
-                <i class="fa-solid fa-mobile-screen-button"></i> Pay via UPI App
-            </a>
-
-            <div style="margin-top: 1.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
-                <div class="form-group">
-                    <label class="form-label">Enter UTR / Reference ID</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-receipt input-icon"></i>
-                        <input type="text" id="utrInput" class="form-input" placeholder="12-digit Transaction ID" maxlength="12">
-                    </div>
-                </div>
-                <button onclick="app.submitUTR()" class="btn btn-primary" style="background-color: var(--text-main);">
-                    <i class="fa-solid fa-check-double"></i> Submit UTR
+            <div id="result-area">
+                <p class="text-sm" style="margin-bottom:8px; font-weight:600;">Payment Link Ready:</p>
+                <div id="generated-url" class="link-box"></div>
+                <button onclick="copyLink()" class="btn btn-secondary" style="font-size: 0.9rem; padding: 10px;">
+                    <i class="fa-regular fa-copy"></i> Copy Link
                 </button>
-                <button onclick="app.reset()" class="btn btn-outline">
-                    Cancel Transaction
+                <button onclick="window.location.reload()" class="btn btn-secondary" style="background:transparent; border:1px solid var(--border); margin-top:8px; font-size:0.9rem; padding: 10px;">
+                    <i class="fa-solid fa-rotate-left"></i> Reset
                 </button>
             </div>
-        </div>
-
-        <!-- SCREEN 3: SUCCESS -->
-        <div id="screen-success" class="card hidden">
-            <div class="success-animation">
-                <i class="fa-solid fa-circle-check check-icon"></i>
-                <h2 class="title" style="margin-bottom: 0.5rem;">Submitted!</h2>
-                <p class="subtitle">Payment submitted successfully.</p>
-                <p class="subtitle" style="color: var(--primary); font-weight: 500;">Verification Pending</p>
-            </div>
-
-            <div style="background: #f9fafb; padding: 1rem; border-radius: 8px; margin: 1.5rem 0;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
-                    <span style="color: var(--text-muted);">Amount</span>
-                    <span id="receiptAmount" style="font-weight: 600;">₹0</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
-                    <span style="color: var(--text-muted);">UTR</span>
-                    <span id="receiptUtr" style="font-weight: 600; font-family: monospace;">-</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
-                    <span style="color: var(--text-muted);">Time</span>
-                    <span id="receiptTime" style="font-weight: 600;">-</span>
-                </div>
-            </div>
-
-            <button onclick="app.fullReset()" class="btn btn-primary">
-                Make Another Payment
-            </button>
         </div>
     </div>
 
-    <div id="toast" class="toast">Message</div>
+    <!-- Payment View -->
+    <div id="payment-view" class="container hidden">
+        <div class="success-overlay" id="success-overlay">
+            <i class="fa-solid fa-circle-check success-icon"></i>
+            <h2 style="margin-bottom: 8px;">Submitted!</h2>
+            <p class="text-sm text-center">UTR received. Verification pending.</p>
+            <button onclick="window.location.href = window.location.pathname" class="btn btn-primary" style="width: auto; margin-top: 20px; padding: 10px 24px;">
+                Create New Link
+            </button>
+        </div>
+
+        <div class="header">
+            <h1><i class="fa-solid fa-shield-halved"></i> Secure Payment</h1>
+            <p class="text-sm" id="payment-date">Fetching details...</p>
+        </div>
+
+        <div class="content">
+            <div class="payment-summary">
+                <div class="payee-badge">
+                    <i class="fa-solid fa-check-circle" style="margin-right: 6px;"></i>
+                    Verified Merchant
+                </div>
+                <div class="amount-display">₹<span id="disp-amount">0</span></div>
+                <p class="text-sm" style="margin-bottom: 4px;">Paying to <span id="disp-vpa" class="meta-value">...</span></p>
+                <p class="text-sm" id="disp-note" style="font-style: italic;">...</p>
+            </div>
+
+            <div class="qr-container">
+                <img id="qr-code" src="" alt="QR Code" onerror="this.style.display='none'">
+            </div>
+
+            <a id="pay-btn" href="#" class="btn btn-primary" style="text-decoration: none;">
+                <i class="fa-brands fa-google-pay"></i> Pay via UPI App
+            </a>
+
+            <div style="margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <h3 style="font-size: 1rem; margin-bottom: 12px;">Confirm Payment</h3>
+                <div class="input-group" style="margin-bottom: 12px;">
+                    <label>Transaction ID / UTR</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-receipt"></i>
+                        <input type="text" id="utr-input" class="input-field" placeholder="12-digit UTR number" maxlength="12">
+                    </div>
+                </div>
+                <button onclick="submitUTR()" class="btn btn-primary" style="background-color: var(--text-main);">
+                    Submit Verification
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"><i class="fa-solid fa-info-circle"></i> <span>Message</span></div>
 
     <script>
-        /**
-         * JSPay Core Logic
-         * Handles encryption, QR generation, state management, and UI transitions.
-         */
-        const app = {
-            state: {
-                step: 1,
-                data: null,
-                encrypted: null
-            },
+        // --- Encryption / Decryption Logic ---
+        
+        // Simple salt to prevent direct Base64 decoding visibility
+        const SALT = "JSPAY_SECURE_";
 
-            // Encryption Utils (Client-side Obfuscation)
-            crypto: {
-                // Simple reversible obfuscation for the 'secure' state
-                encrypt: (text) => {
-                    const b64 = btoa(encodeURIComponent(text));
-                    // Reverse string to make it look like a hash
-                    return b64.split('').reverse().join('');
-                },
-                decrypt: (hash) => {
-                    const b64 = hash.split('').reverse().join('');
-                    return decodeURIComponent(atob(b64));
-                }
-            },
-
-            init: function() {
-                // Check local storage for pending transaction
-                const saved = localStorage.getItem('jspay_session');
-                if (saved) {
-                    try {
-                        const parsed = JSON.parse(saved);
-                        // Decrypt data to ensure integrity
-                        const jsonStr = this.crypto.decrypt(parsed.token);
-                        this.state.data = JSON.parse(jsonStr);
-                        
-                        if (parsed.status === 'pending') {
-                            this.renderPaymentScreen();
-                        } else if (parsed.status === 'submitted') {
-                            this.renderSuccessScreen(parsed.utr, parsed.timestamp);
-                        }
-                    } catch (e) {
-                        console.error("Session corrupted", e);
-                        localStorage.removeItem('jspay_session');
-                    }
-                }
-            },
-
-            generatePayment: function(e) {
-                e.preventDefault();
-                
-                const upiId = document.getElementById('upiId').value.trim();
-                const amount = document.getElementById('amount').value;
-                const note = document.getElementById('note').value.trim();
-
-                if (!upiId || !amount || amount <= 0) {
-                    this.showToast("Please enter valid details");
-                    return;
-                }
-
-                // Create Data Object
-                const paymentData = {
-                    pa: upiId,
-                    pn: "JSPay Merchant", // Default merchant name
-                    am: parseFloat(amount).toFixed(2),
-                    tn: note || "JSPay Transaction",
-                    cu: "INR"
+        function encryptData(dataObj) {
+            try {
+                // Add randomness and timestamp
+                const payload = {
+                    ...dataObj,
+                    ts: Date.now(),
+                    salt: Math.random().toString(36).substring(7)
                 };
-
-                this.state.data = paymentData;
-
-                // Create 'Token'
-                const token = this.crypto.encrypt(JSON.stringify(paymentData));
                 
-                // Save Session
-                localStorage.setItem('jspay_session', JSON.stringify({
-                    status: 'pending',
-                    token: token,
-                    timestamp: new Date().toISOString()
-                }));
-
-                this.renderPaymentScreen();
-            },
-
-            renderPaymentScreen: function() {
-                const data = this.state.data;
+                const jsonStr = JSON.stringify(payload);
+                // 1. Base64 Encode
+                let b64 = btoa(jsonStr);
+                // 2. Simple Rotation (Reverse string) to obfuscate standard b64 padding
+                let scrambled = b64.split('').reverse().join('');
+                // 3. URL Safe replacement
+                scrambled = scrambled.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
                 
-                // Construct UPI Deep Link
-                // upi://pay?pa=...&pn=...&am=...&tn=...&cu=INR
-                const upiLink = `upi://pay?pa=${data.pa}&pn=${encodeURIComponent(data.pn)}&am=${data.am}&tn=${encodeURIComponent(data.tn)}&cu=${data.cu}`;
-                
-                // Update UI
-                document.getElementById('displayAmount').textContent = `₹${data.am}`;
-                document.getElementById('displayVpa').textContent = data.pa;
-                
-                // Generate QR (Using Public API for rendering img)
-                // encodeURIComponent needed for the data param
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}&bgcolor=ffffff`;
-                
-                const qrImg = document.getElementById('qrImage');
-                qrImg.src = qrUrl;
-                
-                // Set Deep Link
-                document.getElementById('deepLinkBtn').href = upiLink;
-
-                // Transition
-                this.switchScreen('screen-config', 'screen-payment');
-            },
-
-            submitUTR: function() {
-                const utr = document.getElementById('utrInput').value.trim();
-                
-                if (!utr || utr.length < 4) {
-                    this.showToast("Please enter a valid UTR/Transaction ID");
-                    return;
-                }
-
-                // Update Session
-                const saved = JSON.parse(localStorage.getItem('jspay_session'));
-                saved.status = 'submitted';
-                saved.utr = utr;
-                saved.timestamp = new Date().toLocaleString();
-                
-                localStorage.setItem('jspay_session', JSON.stringify(saved));
-
-                this.renderSuccessScreen(utr, saved.timestamp);
-            },
-
-            renderSuccessScreen: function(utr, time) {
-                document.getElementById('receiptAmount').textContent = `₹${this.state.data.am}`;
-                document.getElementById('receiptUtr').textContent = utr;
-                document.getElementById('receiptTime').textContent = time;
-
-                this.switchScreen('screen-payment', 'screen-success');
-                // Ensure config is hidden if restoring session directly
-                document.getElementById('screen-config').classList.add('hidden'); 
-            },
-
-            reset: function() {
-                if(confirm("Cancel this transaction?")) {
-                    this.fullReset();
-                }
-            },
-
-            fullReset: function() {
-                localStorage.removeItem('jspay_session');
-                this.state.data = null;
-                
-                // Reset inputs
-                document.getElementById('amount').value = '';
-                document.getElementById('note').value = '';
-                document.getElementById('utrInput').value = '';
-                
-                // Reset View
-                document.getElementById('screen-success').classList.add('hidden');
-                document.getElementById('screen-payment').classList.add('hidden');
-                
-                const config = document.getElementById('screen-config');
-                config.classList.remove('hidden');
-                config.classList.add('fade-in');
-            },
-
-            switchScreen: function(hideId, showId) {
-                const hideEl = document.getElementById(hideId);
-                const showEl = document.getElementById(showId);
-
-                hideEl.style.opacity = '0';
-                setTimeout(() => {
-                    hideEl.classList.add('hidden');
-                    hideEl.style.opacity = '1';
-                    
-                    showEl.classList.remove('hidden');
-                    showEl.classList.add('fade-in');
-                }, 300);
-            },
-
-            showToast: function(msg) {
-                const toast = document.getElementById('toast');
-                toast.textContent = msg;
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
+                return scrambled;
+            } catch (e) {
+                console.error("Encryption failed", e);
+                return null;
             }
-        };
+        }
 
-        // Initialize App
+        function decryptData(hash) {
+            try {
+                // 1. Restore URL safe chars
+                let scrambled = hash.replace(/-/g, '+').replace(/_/g, '/');
+                // 2. Pad Base64 if needed
+                while (scrambled.length % 4) { scrambled += '='; }
+                // 3. Un-reverse
+                let b64 = scrambled.split('').reverse().join('');
+                // 4. Decode
+                const jsonStr = atob(b64);
+                return JSON.parse(jsonStr);
+            } catch (e) {
+                console.error("Decryption failed", e);
+                return null;
+            }
+        }
+
+        // --- UI Logic ---
+
+        const generatorView = document.getElementById('generator-view');
+        const paymentView = document.getElementById('payment-view');
+        
+        // Check mode on load
         window.addEventListener('DOMContentLoaded', () => {
-            app.init();
+            const params = new URLSearchParams(window.location.search);
+            const payHash = params.get('pay');
+
+            if (payHash) {
+                initPaymentMode(payHash);
+            } else {
+                generatorView.classList.remove('hidden');
+            }
         });
 
+        // --- Generator Mode Functions ---
+
+        function generateLink(e) {
+            e.preventDefault();
+            
+            const vpa = document.getElementById('vpa').value.trim();
+            const amount = document.getElementById('amount').value.trim();
+            const note = document.getElementById('note').value.trim();
+
+            if (!vpa || !amount) {
+                showToast("Please fill required fields");
+                return;
+            }
+
+            const data = { pa: vpa, am: amount, tn: note };
+            const encrypted = encryptData(data);
+            
+            if (encrypted) {
+                const url = `${window.location.origin}${window.location.pathname}?pay=${encrypted}`;
+                document.getElementById('generated-url').textContent = url;
+                document.getElementById('result-area').style.display = 'block';
+                showToast("Link Generated Successfully!");
+            }
+        }
+
+        function copyLink() {
+            const urlText = document.getElementById('generated-url').textContent;
+            navigator.clipboard.writeText(urlText).then(() => {
+                showToast("Copied to clipboard!");
+            }).catch(() => {
+                showToast("Failed to copy");
+            });
+        }
+
+        // --- Payment Mode Functions ---
+
+        function initPaymentMode(hash) {
+            const data = decryptData(hash);
+
+            if (!data || !data.pa || !data.am) {
+                showToast("Invalid or Corrupted Link");
+                // Fallback to generator after delay
+                setTimeout(() => window.location.href = window.location.pathname, 2000);
+                return;
+            }
+
+            // Switch Views
+            generatorView.classList.add('hidden');
+            paymentView.classList.remove('hidden');
+
+            // Render Data
+            document.getElementById('disp-amount').textContent = data.am;
+            document.getElementById('disp-vpa').textContent = data.pa;
+            document.getElementById('disp-note').textContent = data.tn || "Payment";
+            
+            const dateObj = new Date(data.ts || Date.now());
+            document.getElementById('payment-date').textContent = dateObj.toLocaleString();
+
+            // Generate UPI String
+            // Format: upi://pay?pa=ADDRESS&pn=NAME&am=AMOUNT&tn=NOTE
+            // Note: pn (Payee Name) is often required by apps, defaulting to 'Merchant' if not known
+            const upiString = `upi://pay?pa=${data.pa}&pn=Merchant&am=${data.am}&tn=${encodeURIComponent(data.tn || 'Payment')}&cu=INR`;
+            
+            // Set Button Link
+            document.getElementById('pay-btn').href = upiString;
+
+            // Generate QR Code
+            // Using a reliable public API for QR generation to keep it single file without huge JS libs
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiString)}`;
+            document.getElementById('qr-code').src = qrUrl;
+        }
+
+        function submitUTR() {
+            const utr = document.getElementById('utr-input').value.trim();
+            
+            if (utr.length < 8) {
+                showToast("Please enter a valid UTR/Transaction ID");
+                return;
+            }
+
+            // Save to LocalStorage (Simulation of backend submission)
+            const history = JSON.parse(localStorage.getItem('jspay_history') || '[]');
+            history.push({
+                utr: utr,
+                date: new Date().toISOString(),
+                amount: document.getElementById('disp-amount').textContent,
+                vpa: document.getElementById('disp-vpa').textContent
+            });
+            localStorage.setItem('jspay_history', JSON.stringify(history));
+
+            // Show Success UI
+            document.getElementById('success-overlay').style.display = 'flex';
+        }
+
+        // --- Utilities ---
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.querySelector('span').textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
     </script>
 </body>
 </html>
