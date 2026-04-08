@@ -1,577 +1,437 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSPay - Secure Payment Gateway</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>JioOnePay Secure Payment</title>
+    <link rel="icon" href="https://www.jio.com/favicon.ico" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
-            --success: #16a34a;
-            --upi-orange: #ff7826;
-            --upi-green: #0cb539;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --radius: 20px;
-        }
-
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            overflow: hidden;
-            position: relative;
-            border: 1px solid var(--border);
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* --- Header Styles --- */
         .header {
-            padding: 20px 24px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-            background: #fff;
+            background-color: #fff;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 10px;
         }
 
-        .logo-area {
+        .header-left {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: var(--primary);
-            margin-bottom: 4px;
         }
 
-        .trusted-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.75rem;
-            background: #ecfdf5;
-            color: var(--success);
-            padding: 4px 8px;
-            border-radius: 99px;
-            font-weight: 600;
-            border: 1px solid #d1fae5;
-        }
-
-        /* --- Content Styles --- */
-        .content {
-            padding: 24px;
-        }
-
-        /* Input Styling */
-        .input-group { margin-bottom: 16px; }
-        
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 6px;
-        }
-
-        .input-wrapper { position: relative; }
-        
-        .input-wrapper i {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-sub);
-            font-size: 0.9rem;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 12px 16px 12px 38px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            outline: none;
-            background: #fff;
-            color: var(--text-main);
-        }
-
-        .input-field:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* Buttons */
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 600;
+        .menu-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 15px;
             cursor: pointer;
-            transition: all 0.2s;
+        }
+        .menu-icon span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background-color: #333;
+            margin-bottom: 5px;
+            border-radius: 1px;
+        }
+        .menu-icon span:last-child {
+            margin-bottom: 0;
+        }
+
+        .jio-logo-container {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        .jio-logo-container img {
+            height: 28px;
+            width: auto;
+            vertical-align: middle;
+        }
+        .jioonepay-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e71111; 
         }
 
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-primary:active { transform: translateY(0); }
-
-        .btn-outline {
-            background: white;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-        }
-
-        .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
-
-        .btn-action-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        /* --- Payment UI Specifics --- */
-        .payment-card-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .merchant-avatar {
-            width: 48px;
-            height: 48px;
-            background: #eff6ff;
-            color: var(--primary);
+        .header-right {
+            width: 36px;
+            height: 36px;
+            background-color: #e0e0e0;
             border-radius: 50%;
             display: flex;
-            align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
-            margin: 0 auto 12px;
-            border: 1px solid #dbeafe;
+            align-items: center;
+            cursor: pointer;
+        }
+        .header-right svg {
+            fill: #1a73e8;
+            width: 24px;
+            height: 24px;
         }
 
-        .amount-box {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px;
-            text-align: center;
-            margin-bottom: 20px;
+        .amount-section {
+            background-color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .amount-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #555;
         }
 
         .amount-value {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--text-main);
-            letter-spacing: -0.5px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #000;
         }
 
-        .qr-frame {
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 12px;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto 20px;
-            position: relative;
-            background: white;
-        }
-        
-        /* QR Scan Lines decoration */
-        .qr-frame::after {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            border-radius: 16px;
-            border: 2px solid transparent;
-            background: linear-gradient(to right, var(--primary), var(--primary)) border-box;
-            -webkit-mask: 
-                linear-gradient(#fff 0 0) padding-box, 
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0.5;
+        .payment-option-card {
+            background-color: #fff;
+            margin: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
 
-        .qr-frame img {
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            transition: background-color 0.2s;
+        }
+        .option-item:last-child {
+            border-bottom: none;
+        }
+        .option-item:active {
+            background-color: #f5f5f5;
+        }
+
+        .option-icon {
+            width: 36px;
+            height: 36px;
+            margin-right: 15px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5;
+            overflow: hidden;
+        }
+        .option-icon img {
             width: 100%;
             height: 100%;
+            border-radius: 50%;
             object-fit: contain;
-            border-radius: 8px;
+        }
+        .option-icon.phonepe { background-color: #6739B7; }
+        .option-icon.paytm { background-color: #fff; border: 1px solid #eee;} 
+        .option-icon.googlepay { background-color: #fff; border: 1px solid #eee; }
+        .option-icon.upi-generic { background-color: #EBF3FF; }
+        .option-icon.qrcode { background-color: #E8F5E9; }
+
+        .option-text {
+            flex-grow: 1;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
         }
 
-        .payment-methods {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            opacity: 0.7;
+        .arrow-icon {
+            width: 12px;
+            height: 12px;
+            margin-left: 10px;
+            border-top: 2px solid #999;
+            border-right: 2px solid #999;
+            transform: rotate(45deg);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+        }
+        .footer strong {
+            font-weight: 700;
+            color: #e71111;
+        }
+
+        #qrCodeSection {
+            background-color: #fff;
+            margin: 10px 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            padding: 20px;
+            text-align: center;
+            display: none;
+        }
+        #qrCodeImage {
+            display: block;
+            margin: 15px auto;
+            height: 200px;
+            width: 200px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: #f9f9f9 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="%23ccc" stroke-width="4"/><circle cx="25" cy="25" r="20" fill="none" stroke="%23333" stroke-width="4" stroke-dasharray="31.4 31.4" transform="rotate(0 25 25)"><animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/></circle></svg>') no-repeat center center;
+            background-size: 40px 40px;
+        }
+        #qrCodeSection p {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .qr-info-display {
+            font-weight: bold;
+            color: #000;
+            margin-top: 5px;
+            display: block;
+            word-break: break-all;
         }
         
-        .pm-icon {
-            font-size: 1.5rem;
-            color: var(--text-sub);
-        }
-
-        .secure-footer {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 0.75rem;
-            color: var(--text-sub);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
-        }
-
-        /* --- Toast Notification --- */
+        /* Custom Toast Notification instead of alert */
         #toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #1e293b;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 99px;
-            font-size: 0.9rem;
-            box-shadow: var(--shadow-lg);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            white-space: nowrap;
-        }
-        #toast.show { transform: translateX(-50%) translateY(0); }
-
-        /* Utility */
-        .hidden { display: none !important; }
-        .text-sm { font-size: 0.85rem; color: var(--text-sub); }
-        .font-bold { font-weight: 700; color: var(--text-main); }
-        .mb-4 { margin-bottom: 1rem; }
-        .w-full { width: 100%; }
-
-        /* Generator Result Box */
-        #result-area {
-            background: #f1f5f9;
-            border-radius: 12px;
+            visibility: hidden;
+            min-width: 250px;
+            margin-left: -125px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
             padding: 16px;
-            margin-top: 20px;
-            border: 1px dashed #94a3b8;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            font-size: 14px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: visibility 0.5s, opacity 0.5s linear;
+            opacity: 0;
         }
-        .url-text {
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            margin-bottom: 12px;
-            display: block;
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
 <body>
 
-    <!-- Generator View (Admin) -->
-    <div id="generator-view" class="container">
-        <div class="header">
-            <div class="logo-area"><i class="fa-solid fa-bolt"></i> JSPay Admin</div>
-            <p class="text-sm">Secure Payment Link Generator</p>
-        </div>
-        
-        <div class="content">
-            <form id="gen-form" onsubmit="generateLink(event)">
-                <div class="input-group">
-                    <label>Receiver UPI ID</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-building-columns"></i>
-                        <input type="text" id="vpa" class="input-field" value="josimsekh33@ybl" placeholder="merchant@upi" required>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label>Amount (INR)</label>
-                    <div class="input-wrapper">
-                        <i class="fa-solid fa-indian-rupee-sign"></i>
-                        <input type="number" id="amount" class="input-field" placeholder="0.00" min="1" step="0.01" required>
-                    </div>
-                </div>
-
-                <div class="input-group">
-                    <label>Payment Note</label>
-                    <div class="input-wrapper">
-                        <i class="fa-regular fa-message"></i>
-                        <input type="text" id="note" class="input-field" placeholder="Bill Reference..." maxlength="50">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa-solid fa-link"></i> Create Secure Link
-                </button>
-            </form>
-
-            <div id="result-area" class="hidden">
-                <label class="text-sm font-bold" style="margin-bottom:4px; display:block;">Generated Link:</label>
-                <code id="generated-url" class="url-text"></code>
-                
-                <div class="btn-action-row">
-                    <button onclick="copyLink()" class="btn btn-outline" style="flex:1;">
-                        <i class="fa-regular fa-copy"></i> Copy
-                    </button>
-                    <a id="open-link-btn" href="#" target="_blank" class="btn btn-outline" style="flex:1; text-decoration: none;">
-                        <i class="fa-solid fa-external-link-alt"></i> Open
-                    </a>
-                </div>
-                
-                <button onclick="resetForm()" class="btn btn-outline" style="margin-top: 10px; border: none; background: transparent; color: var(--text-sub); font-size: 0.85rem;">
-                    Create Another Link
-                </button>
+    <div class="header">
+        <div class="header-left">
+            <div class="menu-icon" id="menuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
+            <div class="jio-logo-container">
+                <img src="https://myjiostatic.cdn.jio.com/jiocom/static/images/500-desktop.svg" alt="My Jio Logo">
+                <span class="jioonepay-text"></span>
+            </div>
+        </div>
+        <div class="header-right">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M16 6a4 4 0 11-8 0 4 4 0 018 0zm4 10.5c0 3.038-3.582 5.5-8 5.5s-8-2.462-8-5.5S7.582 11 12 11s8 2.462 8 5.5z" fill="currentColor"></path>
+            </svg>
         </div>
     </div>
 
-    <!-- Payment View (User) -->
-    <div id="payment-view" class="container hidden">
-        <!-- Success State -->
-        <div id="success-overlay" class="hidden" style="position: absolute; inset:0; background:white; z-index:10; padding:24px; text-align:center; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-            <div style="width:80px; height:80px; background:#dcfce7; color:#16a34a; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; margin-bottom:20px;">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <h2 style="margin-bottom:8px;">Payment Submitted</h2>
-            <p class="text-sm" style="margin-bottom:24px;">Your transaction details have been recorded safely.</p>
-            <button onclick="window.location.reload()" class="btn btn-outline">Close</button>
-        </div>
-
-        <div class="header">
-            <div class="logo-area">
-                <i class="fa-solid fa-shield-halved"></i> SecurePay
-            </div>
-            <div class="trusted-badge">
-                <i class="fa-solid fa-check-circle"></i> Verified Merchant
-            </div>
-        </div>
-
-        <div class="content">
-            <div class="payment-card-header">
-                <p class="text-sm">Paying to</p>
-                <div class="font-bold" style="font-size: 1.1rem; margin-top: 4px;" id="disp-vpa">...</div>
-            </div>
-
-            <div class="amount-box">
-                <p class="text-sm" style="margin-bottom: 4px;">Total Amount</p>
-                <div class="amount-value">₹<span id="disp-amount">0</span></div>
-                <p class="text-sm" id="disp-note" style="margin-top: 4px; font-style: italic;">...</p>
-            </div>
-
-            <div class="qr-frame">
-                <!-- Fallback text while loading -->
-                <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:0; color:#cbd5e1;">
-                    <i class="fa-solid fa-qrcode fa-3x"></i>
-                </div>
-                <img id="qr-code" src="" alt="QR" style="position:relative; z-index:1;">
-            </div>
-
-            <div class="payment-methods">
-                <i class="fa-brands fa-google-pay pm-icon"></i>
-                <i class="fa-brands fa-amazon-pay pm-icon"></i>
-                <i class="fa-solid fa-mobile-screen-button pm-icon"></i>
-            </div>
-
-            <a id="pay-btn" href="#" class="btn btn-primary">
-                Pay via UPI App <i class="fa-solid fa-arrow-right"></i>
-            </a>
-
-            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border);">
-                <div class="input-wrapper">
-                    <input type="text" id="utr-input" class="input-field" placeholder="Enter UTR / Ref No. after payment" maxlength="12" style="text-align: center;">
-                </div>
-                <button onclick="submitUTR()" class="btn btn-outline" style="margin-top: 12px;">
-                    Submit Details
-                </button>
-            </div>
-
-            <div class="secure-footer">
-                <i class="fa-solid fa-lock"></i> Secured by NPCI & UPI Standards
-            </div>
-        </div>
+    <div class="amount-section">
+        <span class="amount-text">Amount payable:</span>
+        <span class="amount-value" id="amountPayable">₹0.00</span>
     </div>
 
-    <!-- Toast -->
-    <div id="toast"><i class="fa-solid fa-circle-info"></i> <span id="toast-msg">Notification</span></div>
+    <div class="payment-option-card">
+        <a href="#" class="option-item" id="phonepe-option">
+            <div class="option-icon phonepe">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2DlG6ujRgP5K1w1FNeUz3jUiAGLrRzrbhu_hL-cEoOWcFPUAmAptMPA&amp;s=10" alt="PhonePe Logo">
+            </div>
+            <span class="option-text">PhonePe</span>
+            <div class="arrow-icon"></div>
+        </a>
+        <a href="#" class="option-item" id="paytm-option">
+            <div class="option-icon paytm">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1-UvppbnMZIjBK7l0xJFBqyuyX7uVj0PL4mA_XPawYg&amp;s" alt="Paytm Logo">
+            </div>
+            <span class="option-text">Paytm</span>
+            <div class="arrow-icon"></div>
+        </a>
+        <a href="#" class="option-item" id="googlepay-option">
+            <div class="option-icon googlepay">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsXIWYADPXxfRhfIdLCQWqM94Y-7FHTAzhE970SB7UyLlaueEFvE8Bct4&amp;s=10" alt="Google Pay Logo">
+            </div>
+            <span class="option-text">Google Pay</span>
+            <div class="arrow-icon"></div>
+        </a>
+    </div>
+
+    <div class="payment-option-card">
+        <a href="#" class="option-item" id="other-upi-apps-option">
+            <div class="option-icon upi-generic">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M15.5 9a1 1 0 00-1-1h-5a1 1 0 000 2h2a1 1 0 110 2h-1a1 1 0 00-.45 1.89l4 2a.931.931 0 00.45.11 1 1 0 00.89-.55 1 1 0 00-.39-1.34l-1.56-.78a3 3 0 00.88-3.33h.18a1 1 0 001-1zM12 2A10 10 0 002 12c-.002.374.021.749.07 1.12a1.007 1.007 0 002-.24A8.493 8.493 0 014 12a8 8 0 112.73 6h.77a1 1 0 000-2h-3a1 1 0 00-1 1v3a1 1 0 002 0v-.43A10 10 0 1012 2z" fill="currentColor"></path>
+                </svg>
+            </div>
+            <span class="option-text">Pay via other UPI app</span>
+            <div class="arrow-icon"></div>
+        </a>
+    </div>
+
+    <div class="payment-option-card">
+        <a href="#" class="option-item" id="qr-code-option">
+            <div class="option-icon qrcode">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 11H5V13H3V11ZM11 11H13V13H11V11ZM17 11H19V13H17V11ZM3 15H5V17H3V15ZM7 15H9V17H7V15ZM11 15H13V17H11V15ZM15 15H17V17H15V15ZM3 19H5V21H3V19ZM7 19H9V21H7V19ZM11 19H13V21H11V19ZM15 19H17V21H15V19ZM19 19H21V21H19V19ZM19 3H21V5H19V3ZM19 7H21V9H19V7ZM19 11H21V13H19V11ZM19 15H21V17H19V15ZM15 3H17V5H15V3ZM15 7H17V9H15V7ZM15 11H17V13H15V11ZM11 3H13V5H11V3ZM11 7H13V9H11V7ZM11 11H13V13H11V11ZM7 3H9V5H7V3ZM7 7H9V9H7V7ZM7 11H9V13H7V11ZM3 3H5V5H3V3ZM3 7H9V9H3V7ZM3 11H5V13H3V11Z" fill="#28A745"/>
+                </svg>
+            </div>
+            <span class="option-text">Pay via QR Code</span>
+            <div class="arrow-icon"></div>
+        </a>
+    </div>
+
+    <div id="qrCodeSection">
+        <p>Scan this QR code with any UPI app</p>
+        <!-- Canvas replaced with an Image tag for API -->
+        <img id="qrCodeImage" src="" alt="Dynamic UPI QR Code">
+        <span class="qr-info-display" id="qrUpiIdDisplay">UPI ID: Loading...</span>
+        <span class="qr-info-display" id="qrAmountDisplay">Amount: ₹0.00</span>
+    </div>
+
+    <div class="footer">
+        powered by <strong style="color: #e71111;">JioOnePay</strong>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">Menu is currently unavailable</div>
 
     <script>
-        // --- Encryption Core ---
-        const SALT = "JSPAY_V1_";
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your EXACT details as provided in the example
+            const upiId = 'sekhjosim31-2@oksbi';
+            const payeeName = 'YUBO SATHI';
+            const defaultRemark = 'Yubo Sathi Sarvice — JS Digital Seva';
+            
+            let currentAmount = '0.00';
+            let currentRemark = defaultRemark;
 
-        function encryptData(data) {
-            try {
-                // Add salt and timestamp
-                const payload = JSON.stringify({ ...data, ts: Date.now(), s: Math.random().toString(36).substr(2, 5) });
-                // Base64 Encode
-                let b64 = btoa(payload);
-                // Obfuscate: Reverse and simple shift
-                let scrambled = b64.split('').reverse().join('');
-                scrambled = scrambled.replace(/a/g, '1').replace(/e/g, '2').replace(/i/g, '3'); // Simple char swap
-                // URL safe
-                return encodeURIComponent(scrambled);
-            } catch(e) { return null; }
-        }
-
-        function decryptData(hash) {
-            try {
-                let scrambled = decodeURIComponent(hash);
-                // Reverse obfuscation
-                scrambled = scrambled.replace(/1/g, 'a').replace(/2/g, 'e').replace(/3/g, 'i');
-                let b64 = scrambled.split('').reverse().join('');
-                return JSON.parse(atob(b64));
-            } catch(e) { return null; }
-        }
-
-        // --- Logic ---
-        const generatorView = document.getElementById('generator-view');
-        const paymentView = document.getElementById('payment-view');
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const payHash = params.get('pay');
-
-            if (payHash) {
-                initPaymentMode(payHash);
-            } else {
-                generatorView.classList.remove('hidden');
+            // 1. Process URL & Auto Encrypt
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('amount') || urlParams.has('remark')) {
+                const rawAmount = urlParams.get('amount') || '0.00';
+                const rawRemark = urlParams.get('remark') || defaultRemark;
+                
+                const payload = JSON.stringify({ a: rawAmount, r: rawRemark });
+                const token = btoa(encodeURIComponent(payload));
+                
+                window.history.replaceState(null, '', window.location.pathname + '?token=' + token);
+                
+                currentAmount = parseFloat(rawAmount).toFixed(2);
+                currentRemark = rawRemark;
+            } 
+            else if (urlParams.has('token')) {
+                try {
+                    const decodedStr = decodeURIComponent(atob(urlParams.get('token')));
+                    const payload = JSON.parse(decodedStr);
+                    currentAmount = parseFloat(payload.a).toFixed(2);
+                    currentRemark = payload.r || defaultRemark;
+                } catch (e) {
+                    console.error("Invalid secure token");
+                }
             }
+
+            // Update UI with the new details
+            document.getElementById('amountPayable').textContent = `₹${currentAmount}`;
+            document.getElementById('qrAmountDisplay').textContent = `Amount: ₹${currentAmount}`;
+            document.getElementById('qrUpiIdDisplay').textContent = `UPI ID: ${upiId}`;
+
+            // 2. Generate Real Working UPI Links exactly as requested
+            const encodedName = encodeURIComponent(payeeName);
+            const encodedRemark = encodeURIComponent(currentRemark);
+            
+            // The exact parameter string format you requested
+            const baseParams = `pa=${upiId}&pn=${encodedName}&am=${currentAmount}&tn=${encodedRemark}&cu=INR`;
+            
+            // Using standard URI schemes combined with your strict parameter structure
+            const links = {
+                phonepe: `phonepe://pay?${baseParams}`,
+                paytm: `paytmmp://pay?${baseParams}`,
+                googlepay: `tez://upi/pay?${baseParams}`,
+                allUpi: `upi://pay?${baseParams}`
+            };
+
+            function setupPaymentButton(id, link) {
+                document.getElementById(id).addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = link;
+                });
+            }
+
+            setupPaymentButton('phonepe-option', links.phonepe);
+            setupPaymentButton('paytm-option', links.paytm);
+            setupPaymentButton('googlepay-option', links.googlepay);
+            setupPaymentButton('other-upi-apps-option', links.allUpi);
+
+            // 3. API Based Dynamic QR Code Logic
+            const qrCodeSection = document.getElementById('qrCodeSection');
+            const qrCodeImage = document.getElementById('qrCodeImage');
+            let qrLoaded = false;
+
+            document.getElementById('qr-code-option').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (qrCodeSection.style.display === 'none' || qrCodeSection.style.display === '') {
+                    qrCodeSection.style.display = 'block';
+                    
+                    if (!qrLoaded) {
+                        const universalUpi = links.allUpi;
+                        const encodedUpiUrl = encodeURIComponent(universalUpi);
+                        
+                        // Using QuickChart.io API for dynamic QR code generation
+                        const apiUrl = `https://quickchart.io/qr?text=${encodedUpiUrl}&size=200&margin=1`;
+                        
+                        qrCodeImage.src = apiUrl;
+                        
+                        qrCodeImage.onload = function() {
+                            qrCodeImage.style.background = 'none';
+                            qrLoaded = true;
+                        };
+                    }
+                    
+                    qrCodeSection.scrollIntoView({behavior: "smooth", block: "end"});
+                } else {
+                    qrCodeSection.style.display = 'none';
+                }
+            });
+
+            // Replaced alert() with a Custom Toast message for better user experience
+            document.getElementById('menuBtn').addEventListener('click', function() {
+                var toast = document.getElementById("toast");
+                toast.className = "show";
+                setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+            });
         });
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toast-msg').innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        // --- Generator Functions ---
-        function generateLink(e) {
-            e.preventDefault();
-            const vpa = document.getElementById('vpa').value.trim();
-            const amt = document.getElementById('amount').value.trim();
-            const note = document.getElementById('note').value.trim();
-
-            if (!vpa || !amt) return showToast("Required fields missing");
-
-            const encrypted = encryptData({ pa: vpa, am: amt, tn: note });
-            const url = `${window.location.origin}${window.location.pathname}?pay=${encrypted}`;
-
-            document.getElementById('generated-url').innerText = url;
-            document.getElementById('open-link-btn').href = url;
-            document.getElementById('result-area').classList.remove('hidden');
-            showToast("Link Generated!");
-        }
-
-        function copyLink() {
-            const txt = document.getElementById('generated-url').innerText;
-            navigator.clipboard.writeText(txt).then(() => showToast("Copied!"));
-        }
-
-        function resetForm() {
-            document.getElementById('gen-form').reset();
-            document.getElementById('result-area').classList.add('hidden');
-        }
-
-        // --- Payment Functions ---
-        function initPaymentMode(hash) {
-            const data = decryptData(hash);
-            
-            if (!data || !data.pa) {
-                showToast("Invalid Link");
-                setTimeout(() => window.location.href = window.location.pathname, 2000);
-                return;
-            }
-
-            generatorView.classList.add('hidden');
-            paymentView.classList.remove('hidden');
-
-            // Set UI Data
-            document.getElementById('disp-vpa').innerText = data.pa;
-            document.getElementById('disp-amount').innerText = data.am;
-            document.getElementById('disp-note').innerText = data.tn || "Payment";
-
-            // Construct Deep Link
-            // IMPORTANT: 'pn' (Payee Name) is recommended. Using 'Merchant' generic.
-            // URL Encoding is crucial for the QR API to read the full string.
-            const upiRaw = `upi://pay?pa=${data.pa}&pn=Merchant&am=${data.am}&tn=${encodeURIComponent(data.tn || '')}&cu=INR`;
-            
-            // Set Button
-            document.getElementById('pay-btn').href = upiRaw;
-
-            // Generate QR using QuickChart (Reliable, handles URL encoding well)
-            // Using ecLevel=M (Medium error correction) and margin=1
-            const qrApi = `https://quickchart.io/qr?text=${encodeURIComponent(upiRaw)}&size=300&ecLevel=M&margin=1&centerImageUrl=https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/UPI-Logo-vector.svg/1200px-UPI-Logo-vector.svg.png&centerImageSizeRatio=0.2`;
-            
-            // Fallback to simpler QR if complex one fails (handled by onerror not strictly needed but good practice)
-            // Or use goqr.me as backup: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiRaw)}`
-            
-            document.getElementById('qr-code').src = qrApi;
-        }
-
-        function submitUTR() {
-            const utr = document.getElementById('utr-input').value.trim();
-            if (utr.length < 4) return showToast("Enter valid UTR");
-            
-            // Show Success Overlay
-            document.getElementById('success-overlay').classList.remove('hidden');
-            document.getElementById('success-overlay').style.display = 'flex';
-        }
     </script>
 </body>
 </html>
-
-
